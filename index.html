@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChefManía - ¡Aprende a Cocinar Jugando!</title>
+    <meta name="description" content="Aprende cocina de forma divertida con ChefManía. Supera niveles, gana medallas y domina el arte de la gastronomía.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- HEADER GLOBAl -->
+    <header id="main-header">
+        <div class="logo-container" onclick="app.showView('home-view')">
+            <span class="logo-text">Chef<span>Manía</span></span>
+        </div>
+        <nav>
+            <div class="stats-container">
+                <div class="stat-item" id="nav-lives">
+                    <span class="icon">❤️</span>
+                    <span class="value" id="lives-display">3</span>
+                </div>
+                <div class="stat-item" id="nav-xp">
+                    <span class="icon">⭐</span>
+                    <span class="value" id="xp-display">0</span>
+                </div>
+                <div class="stat-item" id="nav-coins">
+                    <span class="icon">🪙</span>
+                    <span class="value" id="coins-display">0</span>
+                </div>
+                <button id="shop-btn" class="icon-btn" onclick="app.showView('shop-view')" aria-label="Tienda">🛒</button>
+                <button id="profile-btn" class="icon-btn" onclick="app.showView('profile-view')" aria-label="Ver Perfil">👤</button>
+            </div>
+        </nav>
+    </header>
+
+    <main id="app-container">
+        
+        <!-- VISTA DE INICIO -->
+        <section id="home-view" class="view active-view">
+            <div class="hero-content">
+                <h1>¡Hola, aspirante a Chef!</h1>
+                <p>Bienvenido a la academia culinaria donde aprenderás los secretos de los mejores platos mientras te diviertes.</p>
+                <button class="btn-primary btn-large" onclick="app.showView('level-selection-view')">¡Empezar a Jugar!</button>
+            </div>
+            <div class="hero-image">
+                <img src="mascot.png" alt="Mascota ChefManía" id="main-mascot">
+            </div>
+        </section>
+
+        <!-- VISTA DE PERFIL -->
+        <section id="profile-view" class="view hidden">
+            <div class="header-with-back">
+                <button class="btn-back" onclick="app.showView('home-view')">⬅ Volver</button>
+                <h2>Tu Perfil de Chef</h2>
+            </div>
+            
+            <div class="profile-stats">
+                <div class="stat-card">
+                    <h3>Nivel Actual</h3>
+                    <p class="stat-big" id="profile-level">Principiante</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Experiencia Total</h3>
+                    <p class="stat-big"><span id="profile-xp">0</span> ⭐</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Recetas Completadas</h3>
+                    <p class="stat-big" id="profile-recipes">0</p>
+                </div>
+            </div>
+
+            <div class="achievements-section">
+                <h3>Tus Logros</h3>
+                <div class="achievements-grid" id="achievements-container">
+                    <!-- Generado dinámicamente -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA DE SELECCIÓN DE NIVELES (RECETAS) -->
+        <section id="level-selection-view" class="view hidden">
+            <div class="header-with-back">
+                <button class="btn-back" onclick="app.showView('home-view')">⬅ Volver</button>
+                <h2>Recetario de Misiones</h2>
+            </div>
+            
+            <div class="level-map" id="level-map-container">
+                <!-- Generado dinámicamente por JS -->
+            </div>
+        </section>
+
+        <!-- VISTA DE JUEGO -->
+        <section id="game-view" class="view hidden">
+            <div class="game-header">
+                <button class="btn-icon danger" onclick="app.quitGame()">✖ Abandonar</button>
+                <div class="game-timer" id="game-timer">⏱️ <span id="time-left">00:00</span></div>
+                <div class="game-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="game-progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-educational-panel" id="educational-panel">
+                <div class="chef-tip">
+                    <img src="mascot.png" alt="Chef" class="small-mascot">
+                    <div class="tip-content">
+                        <h3 id="game-task-title">Título de la Tarea</h3>
+                        <p id="game-task-desc">Descripción de lo que tienes que hacer.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-area" id="game-area">
+                <!-- El contenido del minijuego se inyectará aquí -->
+            </div>
+        </section>
+
+        <!-- VISTA DE RESULTADOS -->
+        <section id="results-view" class="view hidden">
+            <div class="results-card">
+                <h2 id="results-title">¡Receta Completada!</h2>
+                <div class="stars-container" id="results-stars">
+                    <!-- Estrellas generadas por JS -->
+                </div>
+                <div class="results-stats">
+                    <p>Puntos Obtenidos: <strong id="results-score">0</strong> ⭐</p>
+                    <p>Errores Cometidos: <strong id="results-mistakes">0</strong></p>
+                </div>
+                <div class="educational-recap" id="results-recap">
+                    <h3>Repaso del Chef:</h3>
+                    <p id="recap-text"></p>
+                </div>
+                <button class="btn-primary" onclick="app.showView('level-selection-view')">Continuar</button>
+            </div>
+        </section>
+
+        <!-- VISTA DE TIENDA -->
+        <section id="shop-view" class="view hidden">
+            <div class="header-with-back">
+                <button class="btn-back" onclick="app.showView('home-view')">⬅ Volver</button>
+                <h2>Mercado del Chef</h2>
+                <p>Usa tus ChefCoins 🪙 para comprar ventajas para tus próximas recetas.</p>
+            </div>
+            
+            <div class="shop-grid">
+                <!-- Tarjeta de Mejora: Tiempo Extra -->
+                <div class="shop-card" id="item-time">
+                    <div class="shop-icon">⏳</div>
+                    <h3>Reloj de Arena</h3>
+                    <p>+5 Segundos en tu próximo nivel.</p>
+                    <button class="btn-primary btn-buy" onclick="app.buyItem('time')">Comprar (30 🪙)</button>
+                    <div class="owned-badge hidden" id="badge-time">¡Equipado!</div>
+                </div>
+                
+                <!-- Tarjeta de Mejora: Seguro de Vidas -->
+                <div class="shop-card" id="item-life">
+                    <div class="shop-icon">❤️</div>
+                    <h3>Seguro Médico</h3>
+                    <p>Recupera 1 vida instantáneamente.</p>
+                    <button class="btn-primary btn-buy" onclick="app.buyItem('life')">Comprar (50 🪙)</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL DE FEEDBACK (CORRECTO/INCORRECTO) -->
+    <div id="feedback-modal" class="modal-overlay hidden">
+        <div class="modal-content" id="feedback-content">
+            <h2 id="feedback-title">¡Ups!</h2>
+            <p id="feedback-message">Mensaje educativo aquí.</p>
+            <button class="btn-primary" id="feedback-btn" onclick="app.closeFeedbackModal()">Entendido</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
