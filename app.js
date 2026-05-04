@@ -6,12 +6,19 @@ const app = {
         completedRecipes: 0,
         unlockedLevels: [1],
         achievements: [],
-        powerups: { extraTime: false }
+        powerups: { extraTime: false },
+        levelScores: {}
     },
     
+    categories: [
+        { id: 'basics', name: 'Técnicas Básicas' },
+        { id: 'advanced', name: 'Platos Avanzados' }
+    ],
+
     levels: [
         {
             id: 1,
+            categoryId: 'basics',
             title: "Cortando Tomates",
             desc: "Pica todos los tomates antes de que se acabe el tiempo.",
             icon: "🍅",
@@ -20,6 +27,7 @@ const app = {
         },
         {
             id: 2,
+            categoryId: 'basics',
             title: "Sopa de Verduras",
             desc: "Selecciona los ingredientes correctos para la sopa.",
             icon: "🍲",
@@ -28,6 +36,7 @@ const app = {
         },
         {
             id: 3,
+            categoryId: 'advanced',
             title: "Pizza Margherita",
             desc: "Amasa y prepara la pizza perfecta.",
             icon: "🍕",
@@ -38,6 +47,7 @@ const app = {
 
     currentGame: {
         id: null,
+        initialTime: 0,
         timer: null,
         timeLeft: 0,
         clicks: 0,
@@ -86,26 +96,56 @@ const app = {
         const container = document.getElementById('level-map-container');
         container.innerHTML = '';
 
-        this.levels.forEach((level, index) => {
-            const isUnlocked = this.state.unlockedLevels.includes(level.id);
-            const isCompleted = this.state.unlockedLevels.includes(level.id + 1) || this.state.completedRecipes >= level.id;
-            
-            const node = document.createElement('div');
-            node.className = `node ${isUnlocked ? '' : 'locked'} ${isCompleted ? 'active' : ''}`;
-            node.onclick = () => isUnlocked ? this.startGame(level.id) : this.showFeedback('Nivel Bloqueado', 'Completa los niveles anteriores para desbloquear esta receta.');
-            
-            node.innerHTML = `
-                <div class="node-icon">${level.icon}</div>
-                <div class="node-title">${level.title}</div>
-            `;
-            container.appendChild(node);
+        this.categories.forEach(category => {
+            const categoryLevels = this.levels.filter(l => l.categoryId === category.id);
+            if (categoryLevels.length === 0) return;
 
-            // Conector excepto el último
-            if (index < this.levels.length - 1) {
-                const connector = document.createElement('div');
-                connector.className = `connector ${isCompleted ? 'active' : ''}`;
-                container.appendChild(connector);
-            }
+            const catContainer = document.createElement('div');
+            catContainer.className = 'category-section';
+            
+            const catTitle = document.createElement('h3');
+            catTitle.className = 'category-title';
+            catTitle.innerText = category.name;
+            catContainer.appendChild(catTitle);
+
+            const mapWrapper = document.createElement('div');
+            mapWrapper.className = 'category-map';
+
+            categoryLevels.forEach((level, index) => {
+                const isUnlocked = this.state.unlockedLevels.includes(level.id);
+                const isCompleted = this.state.unlockedLevels.includes(level.id + 1) || this.state.completedRecipes >= level.id;
+                const scoreData = this.state.levelScores[level.id];
+                
+                const node = document.createElement('div');
+                node.className = `node ${isUnlocked ? '' : 'locked'} ${isCompleted ? 'active' : ''}`;
+                node.onclick = () => isUnlocked ? this.startGame(level.id) : this.showFeedback('Nivel Bloqueado', 'Completa los niveles anteriores para desbloquear esta receta.');
+                
+                let starsHTML = '';
+                if (scoreData) {
+                    const stars = scoreData.stars;
+                    starsHTML = `<div class="node-stars">
+                        <span class="${stars >= 1 ? 'earned' : ''}">★</span>
+                        <span class="${stars >= 2 ? 'earned' : ''}">★</span>
+                        <span class="${stars >= 3 ? 'earned' : ''}">★</span>
+                    </div>`;
+                }
+
+                node.innerHTML = `
+                    <div class="node-icon">${level.icon}</div>
+                    <div class="node-title">${level.title}</div>
+                    ${starsHTML}
+                `;
+                mapWrapper.appendChild(node);
+
+                if (index < categoryLevels.length - 1) {
+                    const connector = document.createElement('div');
+                    connector.className = `connector ${isCompleted ? 'active' : ''}`;
+                    mapWrapper.appendChild(connector);
+                }
+            });
+
+            catContainer.appendChild(mapWrapper);
+            container.appendChild(catContainer);
         });
     },
 
@@ -143,6 +183,7 @@ const app = {
 
         this.currentGame = {
             id: level.id,
+            initialTime: levelTime,
             timeLeft: levelTime,
             clicks: 0,
             targetClicks: level.targetClicks,
@@ -323,12 +364,29 @@ const app = {
         clearInterval(this.currentGame.timer);
         this.currentGame.timer = null;
         
+        let stars = 0;
+        
         if (success) {
-            const score = 50 + (this.currentGame.timeLeft * 2);
-            const earnedCoins = 10 + (this.currentGame.timeLeft > 5 ? 5 : 0); // Bono de monedas si sobra mucho tiempo
+            const timePercentage = this.currentGame.timeLeft / this.currentGame.initialTime;
             
-            this.state.xp += score;
+            if (timePercentage > 0.5 && this.currentGame.mistakes === 0) stars = 3;
+            else if (timePercentage > 0.2 || this.currentGame.mistakes <= 2) stars = 2;
+            else stars = 1;
+
+            const score = 50 + (this.currentGame.timeLeft * 2) - (this.currentGame.mistakes * 5);
+            const finalScore = Math.max(10, score);
+            const earnedCoins = 10 + (stars * 5);
+            
+            this.state.xp += finalScore;
             this.state.coins += earnedCoins;
+
+            const prevScore = this.state.levelScores[this.currentGame.id];
+            if (!prevScore || finalScore > prevScore.score || stars > prevScore.stars) {
+                this.state.levelScores[this.currentGame.id] = {
+                    stars: Math.max(stars, prevScore ? prevScore.stars : 0),
+                    score: Math.max(finalScore, prevScore ? prevScore.score : 0)
+                };
+            }
             
             if(this.currentGame.id === this.state.unlockedLevels[this.state.unlockedLevels.length - 1]) {
                  this.state.completedRecipes++;
@@ -339,8 +397,14 @@ const app = {
             
             document.getElementById('results-title').innerText = "¡Receta Completada!";
             document.getElementById('results-title').style.color = "var(--primary)";
-            document.getElementById('results-stars').innerHTML = "<span class='earned'>★</span><span class='earned'>★</span><span class='earned'>★</span>";
-            document.getElementById('results-score').innerText = `${score} ⭐ | ${earnedCoins} 🪙`;
+            
+            let starsHTML = "";
+            for(let i = 1; i <= 3; i++) {
+                starsHTML += `<span class="${i <= stars ? 'earned' : ''}">★</span>`;
+            }
+            document.getElementById('results-stars').innerHTML = starsHTML;
+            
+            document.getElementById('results-score').innerText = `${finalScore} ⭐ | ${earnedCoins} 🪙`;
             document.getElementById('results-mistakes').innerText = this.currentGame.mistakes;
             document.getElementById('recap-text').innerText = "¡Excelente trabajo! Has ganado algunas monedas.";
         } else {
