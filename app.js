@@ -4,21 +4,23 @@ const app = {
         xp: 0,
         coins: 0,
         completedRecipes: 0,
-        unlockedLevels: [1],
+        unlockedLevels: [1, 4, 5],
         achievements: [],
         powerups: { extraTime: false },
         levelScores: {}
     },
     
     categories: [
-        { id: 'basics', name: 'Técnicas Básicas' },
-        { id: 'advanced', name: 'Platos Avanzados' }
+        { id: 'platillos', name: 'Platillos Principales' },
+        { id: 'postres', name: 'Postres Deliciosos' },
+        { id: 'bebidas', name: 'Bebidas Refrescantes' }
     ],
 
     levels: [
         {
             id: 1,
-            categoryId: 'basics',
+            categoryId: 'platillos',
+            type: 'clicker',
             title: "Cortando Tomates",
             desc: "Pica todos los tomates antes de que se acabe el tiempo.",
             icon: "🍅",
@@ -27,21 +29,100 @@ const app = {
         },
         {
             id: 2,
-            categoryId: 'basics',
+            categoryId: 'platillos',
+            type: 'selection',
             title: "Sopa de Verduras",
             desc: "Selecciona los ingredientes correctos para la sopa.",
             icon: "🍲",
             time: 15,
-            targetClicks: 10
+            ingredients: [
+                { id: 'zanahoria', icon: '🥕', isCorrect: true, name: 'Zanahoria' },
+                { id: 'cebolla', icon: '🧅', isCorrect: true, name: 'Cebolla' },
+                { id: 'papa', icon: '🥔', isCorrect: true, name: 'Papa' },
+                { id: 'caramelo', icon: '🍬', isCorrect: false, name: 'Dulce' },
+                { id: 'zapato', icon: '👞', isCorrect: false, name: 'Zapato' },
+                { id: 'helado', icon: '🍦', isCorrect: false, name: 'Helado' }
+            ]
         },
         {
             id: 3,
-            categoryId: 'advanced',
+            categoryId: 'platillos',
+            type: 'sequence',
             title: "Pizza Margherita",
             desc: "Amasa y prepara la pizza perfecta.",
             icon: "🍕",
             time: 20,
-            targetClicks: 20
+            steps: [
+                { name: 'Amasar', icon: '🍞', target: 5, action: 'amasa rápido' },
+                { name: 'Salsa', icon: '🥫', target: 1, action: 'haz clic para añadir' },
+                { name: 'Queso', icon: '🧀', target: 1, action: 'haz clic para añadir' }
+            ]
+        },
+        {
+            id: 4,
+            categoryId: 'postres',
+            type: 'clicker',
+            title: "Decorando Pastel",
+            desc: "Añade todas las cerezas al pastel.",
+            icon: "🎂",
+            time: 15,
+            targetClicks: 10
+        },
+        {
+            id: 5,
+            categoryId: 'bebidas',
+            type: 'clicker',
+            title: "Limonada Fresca",
+            desc: "Exprime los limones para la bebida.",
+            icon: "🍋",
+            time: 10,
+            targetClicks: 12
+        },
+        {
+            id: 6,
+            categoryId: 'platillos',
+            type: 'sequence',
+            title: "Sushi Maki",
+            desc: "Prepara el arroz y enrolla el sushi.",
+            icon: "🍣",
+            time: 20,
+            steps: [
+                { name: 'Arroz', icon: '🍚', target: 3, action: 'extiende el arroz' },
+                { name: 'Pescado', icon: '🐟', target: 1, action: 'coloca el relleno' },
+                { name: 'Enrollar', icon: '🥢', target: 4, action: 'enrolla firme' }
+            ]
+        },
+        {
+            id: 7,
+            categoryId: 'postres',
+            type: 'selection',
+            title: "Helado Sundae",
+            desc: "Elige ingredientes dulces para el helado.",
+            icon: "🍨",
+            time: 15,
+            ingredients: [
+                { id: 'fresa', icon: '🍓', isCorrect: true, name: 'Fresa' },
+                { id: 'choco', icon: '🍫', isCorrect: true, name: 'Chocolate' },
+                { id: 'cereza', icon: '🍒', isCorrect: true, name: 'Cereza' },
+                { id: 'ajo', icon: '🧄', isCorrect: false, name: 'Ajo' },
+                { id: 'chile', icon: '🌶️', isCorrect: false, name: 'Chile' },
+                { id: 'sal', icon: '🧂', isCorrect: false, name: 'Sal' }
+            ]
+        },
+        {
+            id: 8,
+            categoryId: 'bebidas',
+            type: 'sequence',
+            title: "Café Moka",
+            desc: "Prepara un café con chocolate caliente.",
+            icon: "☕",
+            time: 20,
+            steps: [
+                { name: 'Molido', icon: '🫘', target: 3, action: 'muele los granos' },
+                { name: 'Café', icon: '☕', target: 1, action: 'sirve el café' },
+                { name: 'Chocolate', icon: '🍫', target: 1, action: 'añade chocolate' },
+                { name: 'Leche', icon: '🥛', target: 2, action: 'espuma la leche' }
+            ]
         }
     ],
 
@@ -113,8 +194,8 @@ const app = {
 
             categoryLevels.forEach((level, index) => {
                 const isUnlocked = this.state.unlockedLevels.includes(level.id);
-                const isCompleted = this.state.unlockedLevels.includes(level.id + 1) || this.state.completedRecipes >= level.id;
                 const scoreData = this.state.levelScores[level.id];
+                const isCompleted = !!scoreData;
                 
                 const node = document.createElement('div');
                 node.className = `node ${isUnlocked ? '' : 'locked'} ${isCompleted ? 'active' : ''}`;
@@ -186,7 +267,7 @@ const app = {
             initialTime: levelTime,
             timeLeft: levelTime,
             clicks: 0,
-            targetClicks: level.targetClicks,
+            targetClicks: level.targetClicks || 10,
             mistakes: 0
         };
 
@@ -214,108 +295,15 @@ const app = {
         area.innerHTML = '';
         const level = this.levels.find(l => l.id === this.currentGame.id);
 
-        if (level.id === 1) {
-            // Clicker game
-            const target = document.createElement('div');
-            target.className = 'clicker-target';
-            target.innerText = level.icon;
-            target.onclick = () => {
-                this.currentGame.clicks++;
+        switch(level.type) {
+            case 'clicker':
+                this.currentGame.targetClicks = level.targetClicks;
+                this.currentGame.clicks = 0;
                 
-                // Animar el objetivo
-                target.style.transform = 'scale(0.8)';
-                setTimeout(() => target.style.transform = 'scale(1)', 50);
-
-                // Actualizar barra
-                const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
-                document.getElementById('game-progress-bar').style.width = `${progress}%`;
-
-                if (this.currentGame.clicks >= this.currentGame.targetClicks) {
-                    this.endGame(true);
-                }
-            };
-            area.appendChild(target);
-        } else if (level.id === 2) {
-            // Juego de Selección de Ingredientes
-            const ingredients = [
-                { id: 'zanahoria', icon: '🥕', isCorrect: true, name: 'Zanahoria' },
-                { id: 'cebolla', icon: '🧅', isCorrect: true, name: 'Cebolla' },
-                { id: 'papa', icon: '🥔', isCorrect: true, name: 'Papa' },
-                { id: 'caramelo', icon: '🍬', isCorrect: false, name: 'Dulce' },
-                { id: 'zapato', icon: '👞', isCorrect: false, name: 'Zapato' },
-                { id: 'helado', icon: '🍦', isCorrect: false, name: 'Helado' }
-            ];
-            
-            // Mezclar ingredientes
-            ingredients.sort(() => Math.random() - 0.5);
-            
-            this.currentGame.targetClicks = ingredients.filter(i => i.isCorrect).length; // Necesitamos 3 correctos
-            this.currentGame.clicks = 0; // Correctos encontrados
-
-            ingredients.forEach(ing => {
-                const card = document.createElement('div');
-                card.className = 'ingredient-card';
-                card.innerHTML = `
-                    <div class="ingredient-icon">${ing.icon}</div>
-                    <div class="ingredient-name">${ing.name}</div>
-                `;
-                
-                card.onclick = () => {
-                    if (card.classList.contains('anim-correct') || card.classList.contains('anim-error')) return;
-
-                    if (ing.isCorrect) {
-                        card.classList.add('anim-correct');
-                        this.currentGame.clicks++;
-                        
-                        // Actualizar barra
-                        const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
-                        document.getElementById('game-progress-bar').style.width = `${progress}%`;
-
-                        if (this.currentGame.clicks >= this.currentGame.targetClicks) {
-                            setTimeout(() => this.endGame(true), 500); // Pequeña pausa antes de ganar
-                        }
-                    } else {
-                        card.classList.add('anim-error');
-                        this.currentGame.mistakes++;
-                        // Penalización de tiempo opcional
-                        this.currentGame.timeLeft = Math.max(1, this.currentGame.timeLeft - 2);
-                        
-                        // Pequeño aviso visual extra del error (vibración)
-                        card.style.animation = 'shakeRed 0.5s';
-                        setTimeout(()=> card.style.animation = '', 500);
-                    }
-                };
-                area.appendChild(card);
-            });
-        } else if (level.id === 3) {
-            // Juego de Secuencia de Pizza
-            const steps = [
-                { name: 'Amasar', icon: '🍞', target: 5, action: 'amasa rápido' },
-                { name: 'Salsa', icon: '🥫', target: 1, action: 'haz clic para añadir' },
-                { name: 'Queso', icon: '🧀', target: 1, action: 'haz clic para añadir' }
-            ];
-            
-            let currentStepIndex = 0;
-            let currentStepClicks = 0;
-            this.currentGame.targetClicks = steps.reduce((total, step) => total + step.target, 0);
-            this.currentGame.clicks = 0;
-
-            const renderStep = () => {
-                area.innerHTML = '';
-                const step = steps[currentStepIndex];
-                
-                const title = document.createElement('h3');
-                title.style.width = '100%';
-                title.style.textAlign = 'center';
-                title.style.marginBottom = '1rem';
-                title.innerText = `Paso ${currentStepIndex + 1}: ${step.name} (${step.action})`;
-                area.appendChild(title);
-
                 const target = document.createElement('div');
                 target.className = 'clicker-target';
-                target.innerText = step.icon;
+                target.innerText = level.icon;
                 target.onclick = () => {
-                    currentStepClicks++;
                     this.currentGame.clicks++;
                     
                     target.style.transform = 'scale(0.8)';
@@ -324,27 +312,110 @@ const app = {
                     const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
                     document.getElementById('game-progress-bar').style.width = `${progress}%`;
 
-                    if (currentStepClicks >= step.target) {
-                        currentStepIndex++;
-                        currentStepClicks = 0;
-                        if (currentStepIndex < steps.length) {
-                            renderStep();
-                        } else {
-                            setTimeout(() => this.endGame(true), 500);
-                        }
+                    if (this.currentGame.clicks >= this.currentGame.targetClicks) {
+                        this.endGame(true);
                     }
                 };
                 area.appendChild(target);
-            };
+                break;
 
-            renderStep();
-        } else {
-            area.innerHTML = '<p>Minijuego en construcción... ¡Simulando victoria automática!</p>';
-            setTimeout(() => {
-                if (this.currentGame.timer) {
-                    this.endGame(true);
-                }
-            }, 2000);
+            case 'selection':
+                const ingredients = [...level.ingredients];
+                ingredients.sort(() => Math.random() - 0.5);
+                
+                this.currentGame.targetClicks = ingredients.filter(i => i.isCorrect).length;
+                this.currentGame.clicks = 0;
+
+                ingredients.forEach(ing => {
+                    const card = document.createElement('div');
+                    card.className = 'ingredient-card';
+                    card.innerHTML = `
+                        <div class="ingredient-icon">${ing.icon}</div>
+                        <div class="ingredient-name">${ing.name}</div>
+                    `;
+                    
+                    card.onclick = () => {
+                        if (card.classList.contains('anim-correct') || card.classList.contains('anim-error')) return;
+
+                        if (ing.isCorrect) {
+                            card.classList.add('anim-correct');
+                            this.currentGame.clicks++;
+                            
+                            const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
+                            document.getElementById('game-progress-bar').style.width = `${progress}%`;
+
+                            if (this.currentGame.clicks >= this.currentGame.targetClicks) {
+                                setTimeout(() => this.endGame(true), 500);
+                            }
+                        } else {
+                            card.classList.add('anim-error');
+                            this.currentGame.mistakes++;
+                            this.currentGame.timeLeft = Math.max(1, this.currentGame.timeLeft - 2);
+                            
+                            card.style.animation = 'shakeRed 0.5s';
+                            setTimeout(()=> card.style.animation = '', 500);
+                        }
+                    };
+                    area.appendChild(card);
+                });
+                break;
+
+            case 'sequence':
+                const steps = level.steps;
+                let currentStepIndex = 0;
+                let currentStepClicks = 0;
+                
+                this.currentGame.targetClicks = steps.reduce((total, step) => total + step.target, 0);
+                this.currentGame.clicks = 0;
+
+                const renderStep = () => {
+                    area.innerHTML = '';
+                    const step = steps[currentStepIndex];
+                    
+                    const title = document.createElement('h3');
+                    title.style.width = '100%';
+                    title.style.textAlign = 'center';
+                    title.style.marginBottom = '1rem';
+                    title.innerText = `Paso ${currentStepIndex + 1}: ${step.name} (${step.action})`;
+                    area.appendChild(title);
+
+                    const targetSequence = document.createElement('div');
+                    targetSequence.className = 'clicker-target';
+                    targetSequence.innerText = step.icon;
+                    targetSequence.onclick = () => {
+                        currentStepClicks++;
+                        this.currentGame.clicks++;
+                        
+                        targetSequence.style.transform = 'scale(0.8)';
+                        setTimeout(() => targetSequence.style.transform = 'scale(1)', 50);
+
+                        const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
+                        document.getElementById('game-progress-bar').style.width = `${progress}%`;
+
+                        if (currentStepClicks >= step.target) {
+                            currentStepIndex++;
+                            currentStepClicks = 0;
+                            if (currentStepIndex < steps.length) {
+                                renderStep();
+                            } else {
+                                setTimeout(() => this.endGame(true), 500);
+                            }
+                        }
+                    };
+                    area.appendChild(targetSequence);
+                };
+
+                renderStep();
+                break;
+                
+            default:
+                area.innerHTML = '<p>Minijuego en construcción... ¡Simulando victoria automática!</p>';
+                setTimeout(() => {
+                    if (this.currentGame.timer) {
+                        this.endGame(true);
+                    }
+                }, 2000);
+                break;
         }
     },
 
@@ -388,11 +459,19 @@ const app = {
                 };
             }
             
-            if(this.currentGame.id === this.state.unlockedLevels[this.state.unlockedLevels.length - 1]) {
-                 this.state.completedRecipes++;
-                 if(this.currentGame.id < this.levels.length) {
-                    this.state.unlockedLevels.push(this.currentGame.id + 1);
-                 }
+            const currentLevel = this.levels.find(l => l.id === this.currentGame.id);
+            const categoryLevels = this.levels.filter(l => l.categoryId === currentLevel.categoryId);
+            const currentIndex = categoryLevels.findIndex(l => l.id === currentLevel.id);
+            
+            if (!prevScore) {
+                this.state.completedRecipes++;
+            }
+
+            if (currentIndex !== -1 && currentIndex + 1 < categoryLevels.length) {
+                const nextLevelId = categoryLevels[currentIndex + 1].id;
+                if (!this.state.unlockedLevels.includes(nextLevelId)) {
+                    this.state.unlockedLevels.push(nextLevelId);
+                }
             }
             
             document.getElementById('results-title').innerText = "¡Receta Completada!";
