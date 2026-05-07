@@ -194,6 +194,17 @@ main {
     border-bottom: 2px dashed #eee;
     padding-bottom: 0.5rem;
 }
+.category-progress {
+    font-size: 0.85rem;
+    background: var(--secondary);
+    color: var(--primary-dark);
+    padding: 2px 12px;
+    border-radius: 20px;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-weight: 700;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
 .category-map {
     display: flex;
     flex-direction: column;
@@ -272,22 +283,55 @@ main {
 }
 .achievement {
     background: var(--surface);
-    padding: 1rem;
+    padding: 1.2rem;
     border-radius: var(--radius);
     text-align: center;
     box-shadow: var(--shadow);
-    opacity: 0.5;
-    filter: grayscale(1);
-    transition: all 0.3s;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid transparent;
+    position: relative;
+    cursor: help;
 }
+
+.achievement.locked {
+    opacity: 0.4;
+    filter: grayscale(1) blur(0.5px);
+    background: #f1f1f1;
+}
+
+.achievement.locked:hover {
+    opacity: 0.6;
+    filter: grayscale(0.5);
+}
+
 .achievement.unlocked {
     opacity: 1;
     filter: none;
+    background: white;
+    border-color: var(--warning);
+    box-shadow: 0 10px 20px rgba(255, 209, 102, 0.2);
     transform: translateY(-5px);
-    border: 2px solid var(--warning);
 }
-.achievement-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-.achievement-name { font-size: 0.8rem; font-weight: 600; }
+
+.achievement.unlocked::after {
+    content: '🏆';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 1.2rem;
+    background: var(--warning);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.achievement-icon { font-size: 2.8rem; margin-bottom: 0.5rem; transition: transform 0.3s; }
+.achievement.unlocked:hover .achievement-icon { transform: scale(1.2) rotate(5deg); }
+.achievement-name { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 
 /* --- VISTA DE JUEGO --- */
 .game-header {
@@ -397,6 +441,81 @@ main {
     -webkit-tap-highlight-color: transparent;
 }
 .clicker-target:active { transform: scale(0.9); }
+
+/* MECÁNICA: PRECISIÓN */
+.precision-container {
+    width: 100%;
+    max-width: 400px;
+    height: 40px;
+    background: #e0e0e0;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    margin: 2rem 0;
+    border: 4px solid var(--text);
+}
+.precision-target-zone {
+    position: absolute;
+    height: 100%;
+    background: var(--success);
+    width: 25%;
+    left: 37.5%;
+    box-shadow: 0 0 15px var(--success);
+}
+.precision-marker {
+    position: absolute;
+    width: 8px;
+    height: 100%;
+    background: var(--accent);
+    left: 0;
+    z-index: 10;
+}
+
+/* MECÁNICA: CLASIFICACIÓN */
+.sorting-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+}
+.sorting-item {
+    font-size: 5rem;
+    padding: 2rem;
+    background: var(--surface-alt);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.sorting-bins {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    justify-content: center;
+}
+.sorting-bin {
+    flex: 1;
+    max-width: 200px;
+    padding: 1.5rem;
+    background: var(--surface);
+    border: 3px solid var(--primary);
+    border-radius: var(--radius);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.sorting-bin:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+.sorting-bin-icon { font-size: 2.5rem; }
+.sorting-bin-name { font-weight: 800; margin-top: 0.5rem; }
+
+@keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
 
 /* --- RESULTADOS --- */
 #results-view {

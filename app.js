@@ -4,10 +4,25 @@ const app = {
         xp: 0,
         coins: 0,
         completedRecipes: 0,
-        unlockedLevels: [1, 4, 5],
+        unlockedLevels: [1, 4, 5, 9, 11, 15],
         achievements: [],
         powerups: { extraTime: false },
-        levelScores: {}
+        levelScores: {},
+        perfectWins: 0,
+        purchasedItems: []
+    },
+
+    saveState() {
+        localStorage.setItem('chefManiaState', JSON.stringify(this.state));
+    },
+
+    loadState() {
+        const saved = localStorage.getItem('chefManiaState');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Merge to ensure new state properties are preserved if we update the app
+            this.state = { ...this.state, ...parsed };
+        }
     },
     
     categories: [
@@ -123,6 +138,172 @@ const app = {
                 { name: 'Chocolate', icon: '🍫', target: 1, action: 'añade chocolate' },
                 { name: 'Leche', icon: '🥛', target: 2, action: 'espuma la leche' }
             ]
+        },
+        {
+            id: 9,
+            categoryId: 'platillos',
+            type: 'precision',
+            title: "El Punto de la Carne",
+            desc: "Detén el fuego cuando esté en el punto ideal.",
+            icon: "🥩",
+            time: 15,
+            targetSuccess: 3
+        },
+        {
+            id: 10,
+            categoryId: 'postres',
+            type: 'sorting',
+            title: "Organiza la Alacena",
+            desc: "Guarda cada ingrediente en su lugar correspondiente.",
+            icon: "📦",
+            time: 20,
+            items: [
+                { icon: '🥛', bin: 'nevera', name: 'Leche' },
+                { icon: '🥚', bin: 'nevera', name: 'Huevos' },
+                { icon: '🌾', bin: 'despensa', name: 'Harina' },
+                { icon: '🥫', bin: 'despensa', name: 'Lata' },
+                { icon: '🥩', bin: 'nevera', name: 'Carne' },
+                { icon: '🍝', bin: 'despensa', name: 'Pasta' }
+            ]
+        },
+        {
+            id: 11,
+            categoryId: 'bebidas',
+            type: 'precision',
+            title: "Espresso Maestro",
+            desc: "Detén la extracción en el momento justo.",
+            icon: "☕",
+            time: 12,
+            targetSuccess: 2
+        },
+        {
+            id: 12,
+            categoryId: 'platillos',
+            type: 'sorting',
+            title: "Reciclaje en Cocina",
+            desc: "Separa los restos orgánicos de los envases.",
+            icon: "♻️",
+            time: 15,
+            items: [
+                { icon: '🍎', bin: 'organico', name: 'Manzana' },
+                { icon: '🧃', bin: 'envases', name: 'Brik' },
+                { icon: '🍌', bin: 'organico', name: 'Plátano' },
+                { icon: '🍼', bin: 'envases', name: 'Botella' },
+                { icon: '🥚', bin: 'organico', name: 'Cáscara' }
+            ],
+            customBins: [
+                { id: 'organico', name: 'Orgánico', icon: '🍃' },
+                { id: 'envases', name: 'Envases', icon: '🟡' }
+            ]
+        },
+        {
+            id: 13,
+            categoryId: 'postres',
+            type: 'selection',
+            title: "Tarta de Queso",
+            desc: "Elige solo los ingredientes de la tarta.",
+            icon: "🍰",
+            time: 15,
+            ingredients: [
+                { id: 'queso', icon: '🧀', isCorrect: true, name: 'Queso Crema' },
+                { id: 'galleta', icon: '🍪', isCorrect: true, name: 'Galletas' },
+                { id: 'mermelada', icon: '🍓', isCorrect: true, name: 'Mermelada' },
+                { id: 'pepino', icon: '🥒', isCorrect: false, name: 'Pepino' },
+                { id: 'pollo', icon: '🍗', isCorrect: false, name: 'Pollo' }
+            ]
+        },
+        {
+            id: 14,
+            categoryId: 'platillos',
+            type: 'sequence',
+            title: "Hamburguesa Gourmet",
+            desc: "Monta las capas de la hamburguesa.",
+            icon: "🍔",
+            time: 20,
+            steps: [
+                { name: 'Pan', icon: '🍞', target: 1, action: 'base' },
+                { name: 'Carne', icon: '🥩', target: 1, action: 'cocinar' },
+                { name: 'Queso', icon: '🧀', target: 1, action: 'fundir' },
+                { name: 'Lechuga', icon: '🥬', target: 1, action: 'frescura' }
+            ]
+        },
+        {
+            id: 15,
+            categoryId: 'bebidas',
+            type: 'clicker',
+            title: "Batido Energético",
+            desc: "Agita el batido con fuerza.",
+            icon: "🥤",
+            time: 8,
+            targetClicks: 20
+        },
+        {
+            id: 16,
+            categoryId: 'postres',
+            type: 'precision',
+            title: "Caramelizar Azúcar",
+            desc: "No dejes que el azúcar se queme.",
+            icon: "🍯",
+            time: 15,
+            targetSuccess: 4
+        },
+        {
+            id: 17,
+            categoryId: 'bebidas',
+            type: 'sorting',
+            title: "Barista Junior",
+            desc: "Separa las tazas de los vasos fríos.",
+            icon: "🥛",
+            time: 15,
+            items: [
+                { icon: '☕', bin: 'caliente', name: 'Taza' },
+                { icon: '🥤', bin: 'frio', name: 'Vaso' },
+                { icon: '🍵', bin: 'caliente', name: 'Infusión' },
+                { icon: '🍹', bin: 'frio', name: 'Cóctel' }
+            ],
+            customBins: [
+                { id: 'caliente', name: 'Caliente', icon: '🔥' },
+                { id: 'frio', name: 'Frío', icon: '❄️' }
+            ]
+        },
+        {
+            id: 18,
+            categoryId: 'platillos',
+            type: 'selection',
+            title: "Especias Curry",
+            desc: "Selecciona las especias aromáticas.",
+            icon: "🍛",
+            time: 15,
+            ingredients: [
+                { id: 'curcuma', icon: '🟡', isCorrect: true, name: 'Cúrcuma' },
+                { id: 'comino', icon: '🤎', isCorrect: true, name: 'Comino' },
+                { id: 'pimenton', icon: '🔴', isCorrect: true, name: 'Pimentón' },
+                { id: 'chocolate', icon: '🍫', isCorrect: false, name: 'Choco' }
+            ]
+        },
+        {
+            id: 19,
+            categoryId: 'postres',
+            type: 'sequence',
+            title: "Montar Nata",
+            desc: "Bate hasta que esté firme.",
+            icon: "🍦",
+            time: 15,
+            steps: [
+                { name: 'Nata', icon: '🥛', target: 2, action: 'verter' },
+                { name: 'Azúcar', icon: '🍬', target: 1, action: 'endulzar' },
+                { name: 'Batir', icon: '🌪️', target: 8, action: '¡rápido!' }
+            ]
+        },
+        {
+            id: 20,
+            categoryId: 'platillos',
+            type: 'precision',
+            title: "Pasta al Dente",
+            desc: "Saca la pasta en el segundo exacto.",
+            icon: "🍝",
+            time: 15,
+            targetSuccess: 3
         }
     ],
 
@@ -137,7 +318,9 @@ const app = {
     },
 
     init() {
+        this.loadState();
         this.updateHeaderStats();
+        this.updateProfileStats();
         this.renderLevelMap();
         this.renderAchievements();
     },
@@ -163,12 +346,18 @@ const app = {
     },
 
     updateProfileStats() {
+        if (!document.getElementById('profile-xp')) return;
+
         document.getElementById('profile-xp').innerText = this.state.xp;
         document.getElementById('profile-recipes').innerText = this.state.completedRecipes;
         
-        let rank = "Principiante";
-        if(this.state.xp > 50) rank = "Cocinero Novato";
-        if(this.state.xp > 150) rank = "Chef de Partie";
+        let rank = "Pinche de Cocina";
+        if(this.state.xp >= 100) rank = "Aprendiz de Chef";
+        if(this.state.xp >= 300) rank = "Cocinero de Línea";
+        if(this.state.xp >= 600) rank = "Sous Chef";
+        if(this.state.xp >= 1000) rank = "Chef Ejecutivo";
+        if(this.state.xp >= 2000) rank = "Maestro Gastronómico";
+        
         document.getElementById('profile-level').innerText = rank;
     },
 
@@ -181,12 +370,15 @@ const app = {
             const categoryLevels = this.levels.filter(l => l.categoryId === category.id);
             if (categoryLevels.length === 0) return;
 
+            const completedCount = categoryLevels.filter(l => this.state.levelScores[l.id]).length;
+            const progressPercent = Math.round((completedCount / categoryLevels.length) * 100);
+
             const catContainer = document.createElement('div');
             catContainer.className = 'category-section';
             
             const catTitle = document.createElement('h3');
             catTitle.className = 'category-title';
-            catTitle.innerText = category.name;
+            catTitle.innerHTML = `${category.name} <span class="category-progress">${progressPercent}%</span>`;
             catContainer.appendChild(catTitle);
 
             const mapWrapper = document.createElement('div');
@@ -232,16 +424,33 @@ const app = {
 
     renderAchievements() {
         const container = document.getElementById('achievements-container');
-        container.innerHTML = `
-            <div class="achievement ${this.state.completedRecipes > 0 ? 'unlocked' : ''}">
-                <div class="achievement-icon">🔪</div>
-                <div class="achievement-name">Primer Corte</div>
+        if (!container) return;
+
+        const hasThreeStars = Object.values(this.state.levelScores).some(s => s.stars === 3);
+        
+        // Verificar si alguna categoría está completa (100%)
+        const hasFullCategory = this.categories.some(cat => {
+            const catLevels = this.levels.filter(l => l.categoryId === cat.id);
+            return catLevels.every(l => this.state.levelScores[l.id]);
+        });
+
+        const achievements = [
+            { id: 'first', name: 'Primer Corte', icon: '🔪', unlocked: this.state.completedRecipes > 0 },
+            { id: 'perfect3', name: 'Cocina Impecable', icon: '✨', unlocked: this.state.perfectWins >= 3 },
+            { id: 'speed', name: 'Chef Relámpago', icon: '⚡', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.fastWin) },
+            { id: 'clutch', name: 'Al Filo', icon: '🕒', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.clutchWin) },
+            { id: 'investor', name: 'Inversionista', icon: '💎', unlocked: this.state.purchasedItems.length >= 2 },
+            { id: 'master', name: 'Dominio Temático', icon: '🎓', unlocked: hasFullCategory },
+            { id: 'xp500', name: 'Chef de Oro', icon: '🏆', unlocked: this.state.xp >= 500 },
+            { id: 'recipes5', name: 'Gourmet', icon: '🥗', unlocked: this.state.completedRecipes >= 5 }
+        ];
+
+        container.innerHTML = achievements.map(ach => `
+            <div class="achievement ${ach.unlocked ? 'unlocked' : 'locked'}" title="${ach.unlocked ? '¡Logrado!' : 'Aún por descubrir'}">
+                <div class="achievement-icon">${ach.icon}</div>
+                <div class="achievement-name">${ach.name}</div>
             </div>
-            <div class="achievement ${this.state.xp >= 100 ? 'unlocked' : ''}">
-                <div class="achievement-icon">🌟</div>
-                <div class="achievement-name">Cien Estrellas</div>
-            </div>
-        `;
+        `).join('');
     },
 
     // Lógica del Juego
@@ -407,6 +616,120 @@ const app = {
 
                 renderStep();
                 break;
+
+            case 'precision':
+                this.currentGame.targetClicks = level.targetSuccess;
+                this.currentGame.clicks = 0;
+                
+                const pContainer = document.createElement('div');
+                pContainer.className = 'precision-container';
+                
+                const pTarget = document.createElement('div');
+                pTarget.className = 'precision-target-zone';
+                pContainer.appendChild(pTarget);
+                
+                const pMarker = document.createElement('div');
+                pMarker.className = 'precision-marker';
+                pContainer.appendChild(pMarker);
+                
+                area.appendChild(pContainer);
+                
+                const pBtn = document.createElement('button');
+                pBtn.className = 'btn-primary btn-large';
+                pBtn.innerText = '¡FUEGO!';
+                area.appendChild(pBtn);
+
+                let markerPos = 0;
+                let direction = 1;
+                const speed = 2.5;
+
+                const moveMarker = () => {
+                    if (!this.currentGame.timer) return;
+                    markerPos += speed * direction;
+                    if (markerPos >= 98 || markerPos <= 0) direction *= -1;
+                    pMarker.style.left = `${markerPos}%`;
+                    requestAnimationFrame(moveMarker);
+                };
+                requestAnimationFrame(moveMarker);
+
+                pBtn.onclick = () => {
+                    if (markerPos >= 37.5 && markerPos <= 62.5) { // Rango de la zona verde
+                        this.currentGame.clicks++;
+                        this.showFeedback('¡Perfecto!', '¡Sigue así!', false);
+                        const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
+                        document.getElementById('game-progress-bar').style.width = `${progress}%`;
+                        
+                        if (this.currentGame.clicks >= this.currentGame.targetClicks) {
+                            setTimeout(() => this.endGame(true), 500);
+                        }
+                    } else {
+                        this.currentGame.mistakes++;
+                        this.currentGame.timeLeft = Math.max(1, this.currentGame.timeLeft - 3);
+                        this.showFeedback('¡Se quema!', 'Ten más cuidado con el tiempo.', true);
+                    }
+                };
+                break;
+
+            case 'sorting':
+                this.currentGame.targetClicks = level.items.length;
+                this.currentGame.clicks = 0;
+                let currentItemIndex = 0;
+
+                const renderItem = () => {
+                    area.innerHTML = '';
+                    const item = level.items[currentItemIndex];
+                    
+                    const sortContainer = document.createElement('div');
+                    sortContainer.className = 'sorting-container';
+                    
+                    const sortItem = document.createElement('div');
+                    sortItem.className = 'sorting-item';
+                    sortItem.innerText = item.icon;
+                    sortContainer.appendChild(sortItem);
+                    
+                    const sortBins = document.createElement('div');
+                    sortBins.className = 'sorting-bins';
+                    
+                    const bins = level.customBins || [
+                        { id: 'nevera', name: 'Nevera', icon: '❄️' },
+                        { id: 'despensa', name: 'Despensa', icon: '📦' }
+                    ];
+
+                    bins.forEach(bin => {
+                        const binDiv = document.createElement('div');
+                        binDiv.className = 'sorting-bin';
+                        binDiv.innerHTML = `
+                            <div class="sorting-bin-icon">${bin.icon}</div>
+                            <div class="sorting-bin-name">${bin.name}</div>
+                        `;
+                        binDiv.onclick = () => {
+                            if (bin.id === item.bin) {
+                                this.currentGame.clicks++;
+                                currentItemIndex++;
+                                const progress = (this.currentGame.clicks / this.currentGame.targetClicks) * 100;
+                                document.getElementById('game-progress-bar').style.width = `${progress}%`;
+                                
+                                if (currentItemIndex < level.items.length) {
+                                    renderItem();
+                                } else {
+                                    setTimeout(() => this.endGame(true), 500);
+                                }
+                            } else {
+                                this.currentGame.mistakes++;
+                                this.currentGame.timeLeft = Math.max(1, this.currentGame.timeLeft - 2);
+                                binDiv.style.animation = 'shakeRed 0.5s';
+                                setTimeout(() => binDiv.style.animation = '', 500);
+                            }
+                        };
+                        sortBins.appendChild(binDiv);
+                    });
+                    
+                    sortContainer.appendChild(sortBins);
+                    area.appendChild(sortContainer);
+                };
+
+                renderItem();
+                break;
                 
             default:
                 area.innerHTML = '<p>Minijuego en construcción... ¡Simulando victoria automática!</p>';
@@ -429,6 +752,7 @@ const app = {
         if (this.state.lives <= 0) {
             this.showFeedback('¡Sin Vidas!', 'Te has quedado sin vidas. Vuelve más tarde.', true);
         }
+        this.saveState();
     },
 
     endGame(success) {
@@ -452,19 +776,30 @@ const app = {
             this.state.coins += earnedCoins;
 
             const prevScore = this.state.levelScores[this.currentGame.id];
-            if (!prevScore || finalScore > prevScore.score || stars > prevScore.stars) {
-                this.state.levelScores[this.currentGame.id] = {
-                    stars: Math.max(stars, prevScore ? prevScore.stars : 0),
-                    score: Math.max(finalScore, prevScore ? prevScore.score : 0)
-                };
-            }
-            
             const currentLevel = this.levels.find(l => l.id === this.currentGame.id);
             const categoryLevels = this.levels.filter(l => l.categoryId === currentLevel.categoryId);
             const currentIndex = categoryLevels.findIndex(l => l.id === currentLevel.id);
-            
+
             if (!prevScore) {
                 this.state.completedRecipes++;
+            }
+
+            // Nuevas métricas para insignias
+            if (this.currentGame.mistakes === 0) {
+                this.state.perfectWins++;
+            }
+
+            const timeSpent = this.currentGame.initialTime - this.currentGame.timeLeft;
+            const isFastWin = timeSpent <= 5;
+            const isClutchWin = this.currentGame.timeLeft <= 2;
+
+            if (!prevScore || finalScore > prevScore.score || stars > prevScore.stars || isFastWin || isClutchWin) {
+                this.state.levelScores[this.currentGame.id] = {
+                    stars: Math.max(stars, prevScore ? prevScore.stars : 0),
+                    score: Math.max(finalScore, prevScore ? prevScore.score : 0),
+                    fastWin: isFastWin || (prevScore ? prevScore.fastWin : false),
+                    clutchWin: isClutchWin || (prevScore ? prevScore.clutchWin : false)
+                };
             }
 
             if (currentIndex !== -1 && currentIndex + 1 < categoryLevels.length) {
@@ -497,8 +832,10 @@ const app = {
         }
 
         this.updateHeaderStats();
+        this.updateProfileStats();
         this.renderLevelMap();
         this.renderAchievements();
+        this.saveState();
         this.showView('results-view');
     },
 
@@ -528,6 +865,7 @@ const app = {
             if (this.state.coins >= 30) {
                 this.state.coins -= 30;
                 this.state.powerups.extraTime = true;
+                if (!this.state.purchasedItems.includes('time')) this.state.purchasedItems.push('time');
                 this.updateHeaderStats();
                 document.getElementById('badge-time').classList.remove('hidden');
                 this.showFeedback('¡Compra Exitosa!', 'Has equipado el Reloj de Arena. Tendrás +5 segundos en tu próxima receta.');
@@ -542,12 +880,14 @@ const app = {
             if (this.state.coins >= 50) {
                 this.state.coins -= 50;
                 this.state.lives++;
+                if (!this.state.purchasedItems.includes('life')) this.state.purchasedItems.push('life');
                 this.updateHeaderStats();
                 this.showFeedback('¡Compra Exitosa!', 'Has recuperado 1 vida. ¡Sigue cocinando!');
             } else {
                 this.showFeedback('Fondos Insuficientes', 'No tienes suficientes monedas para comprar esto.', true);
             }
         }
+        this.saveState();
     }
 };
 
