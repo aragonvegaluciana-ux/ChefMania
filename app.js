@@ -9,7 +9,8 @@ const app = {
         powerups: { extraTime: false },
         levelScores: {},
         perfectWins: 0,
-        purchasedItems: []
+        purchasedItems: [],
+        lastLifeTime: Date.now()
     },
 
     saveState() {
@@ -319,10 +320,36 @@ const app = {
 
     init() {
         this.loadState();
+        this.startLifeRegenTimer();
         this.updateHeaderStats();
         this.updateProfileStats();
         this.renderLevelMap();
         this.renderAchievements();
+    },
+
+    startLifeRegenTimer() {
+        setInterval(() => {
+            this.calculateLifeRegen();
+            this.updateHeaderStats();
+        }, 1000);
+    },
+
+    calculateLifeRegen() {
+        if (this.state.lives >= 3) {
+            this.state.lastLifeTime = Date.now();
+            return;
+        }
+
+        const now = Date.now();
+        const diff = now - this.state.lastLifeTime;
+        const regenTime = 5 * 60 * 1000; // 5 minutos en ms
+
+        if (diff >= regenTime) {
+            const livesToGain = Math.floor(diff / regenTime);
+            this.state.lives = Math.min(3, this.state.lives + livesToGain);
+            this.state.lastLifeTime = now - (diff % regenTime);
+            this.saveState();
+        }
     },
 
     // Navegación
@@ -340,9 +367,30 @@ const app = {
 
     // Actualizaciones de UI
     updateHeaderStats() {
-        document.getElementById('lives-display').innerText = this.state.lives;
+        const livesDisp = document.getElementById('lives-display');
+        livesDisp.innerText = this.state.lives;
         document.getElementById('xp-display').innerText = this.state.xp;
         document.getElementById('coins-display').innerText = this.state.coins;
+
+        // Mostrar contador si faltan vidas
+        let timerSpan = document.getElementById('life-timer');
+        if (this.state.lives < 3) {
+            if (!timerSpan) {
+                timerSpan = document.createElement('span');
+                timerSpan.id = 'life-timer';
+                timerSpan.style.fontSize = '0.7rem';
+                timerSpan.style.color = 'var(--accent)';
+                timerSpan.style.marginLeft = '5px';
+                document.getElementById('nav-lives').appendChild(timerSpan);
+            }
+            const nextRegen = this.state.lastLifeTime + (5 * 60 * 1000);
+            const timeLeft = Math.max(0, Math.round((nextRegen - Date.now()) / 1000));
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            timerSpan.innerText = `${mins}:${secs < 10 ? '0'+secs : secs}`;
+        } else if (timerSpan) {
+            timerSpan.remove();
+        }
     },
 
     updateProfileStats() {
@@ -745,12 +793,17 @@ const app = {
     quitGame() {
         clearInterval(this.currentGame.timer);
         this.currentGame.timer = null;
+        
+        if (this.state.lives === 3) {
+            this.state.lastLifeTime = Date.now();
+        }
+        
         this.state.lives--;
         this.updateHeaderStats();
         this.showView('level-selection-view');
         
         if (this.state.lives <= 0) {
-            this.showFeedback('¡Sin Vidas!', 'Te has quedado sin vidas. Vuelve más tarde.', true);
+            this.showFeedback('¡Sin Vidas!', 'Te has quedado sin vidas. Vuelve en unos minutos para que se recarguen.', true);
         }
         this.saveState();
     },
@@ -822,6 +875,9 @@ const app = {
             document.getElementById('results-mistakes').innerText = this.currentGame.mistakes;
             document.getElementById('recap-text').innerText = "¡Excelente trabajo! Has ganado algunas monedas.";
         } else {
+            if (this.state.lives === 3) {
+                this.state.lastLifeTime = Date.now();
+            }
             this.state.lives--;
             document.getElementById('results-title').innerText = "¡Se acabó el tiempo!";
             document.getElementById('results-title').style.color = "var(--accent)";
