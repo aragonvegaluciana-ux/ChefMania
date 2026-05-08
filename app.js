@@ -944,6 +944,42 @@ const app = {
             }
         }
         this.saveState();
+    },
+
+    inviteFriend() {
+        const inviteLink = "https://chefmania.app/invite/chef" + Math.floor(Math.random() * 1000);
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'ChefManía - ¡Aprende a Cocinar!',
+                text: '¡Oye! Mira este juego para aprender cocina. Si te unes con mi enlace, ¡nos dan monedas a los dos!',
+                url: inviteLink,
+            }).then(() => {
+                this.showFeedback('¡Genial!', 'Has compartido la invitación con éxito.');
+            }).catch(() => {
+                this.copyToClipboard(inviteLink);
+            });
+        } else {
+            this.copyToClipboard(inviteLink);
+        }
+    },
+
+    copyToClipboard(text) {
+        const tempInput = document.createElement("input");
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        
+        this.showFeedback('Enlace Copiado', 'Se ha copiado tu enlace de invitación: ' + text + '. ¡Envíalo a tus amigos para ganar 50 monedas!');
+        
+        // Simulación de recompensa por invitar
+        setTimeout(() => {
+            this.state.coins += 50;
+            this.updateHeaderStats();
+            this.saveState();
+        }, 2000);
     }
 };
 
