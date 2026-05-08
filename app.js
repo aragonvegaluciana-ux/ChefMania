@@ -956,7 +956,9 @@ const app = {
                 url: inviteLink,
             }).then(() => {
                 this.showFeedback('¡Genial!', 'Has compartido la invitación con éxito.');
-            }).catch(() => {
+                this.giveInviteReward();
+            }).catch((err) => {
+                console.log("Error sharing:", err);
                 this.copyToClipboard(inviteLink);
             });
         } else {
@@ -965,21 +967,43 @@ const app = {
     },
 
     copyToClipboard(text) {
-        const tempInput = document.createElement("input");
-        tempInput.value = text;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
-        
-        this.showFeedback('Enlace Copiado', 'Se ha copiado tu enlace de invitación: ' + text + '. ¡Envíalo a tus amigos para ganar 50 monedas!');
-        
-        // Simulación de recompensa por invitar
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.handleCopySuccess(text);
+            }).catch(() => {
+                this.fallbackCopyTextToClipboard(text);
+            });
+        } else {
+            this.fallbackCopyTextToClipboard(text);
+        }
+    },
+
+    fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            this.handleCopySuccess(text);
+        } catch (err) {
+            this.showFeedback('Error', 'No se pudo copiar el enlace. Inténtalo de nuevo.', true);
+        }
+        document.body.removeChild(textArea);
+    },
+
+    handleCopySuccess(text) {
+        this.showFeedback('Enlace Copiado', 'Se ha copiado tu enlace de invitación: ' + text + '. ¡Envíalo a tus amigos!');
+        this.giveInviteReward();
+    },
+
+    giveInviteReward() {
+        // Evitar múltiples recompensas en la misma sesión si se desea
         setTimeout(() => {
             this.state.coins += 50;
             this.updateHeaderStats();
             this.saveState();
-        }, 2000);
+        }, 1500);
     }
 };
 
