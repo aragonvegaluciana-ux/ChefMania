@@ -30,6 +30,7 @@
                     <span class="icon">🪙</span>
                     <span class="value" id="coins-display">0</span>
                 </div>
+                <button id="recipes-btn" class="icon-btn" onclick="app.showView('level-selection-view')" aria-label="Recetario">📖</button>
                 <button id="shop-btn" class="icon-btn" onclick="app.showView('shop-view')" aria-label="Tienda">🛒</button>
                 <button id="profile-btn" class="icon-btn" onclick="app.showView('profile-view')" aria-label="Ver Perfil">👤</button>
             </div>
@@ -53,7 +54,6 @@
         <!-- VISTA DE PERFIL -->
         <section id="profile-view" class="view hidden">
             <div class="header-with-back">
-                <button class="btn-back" onclick="app.showView('level-selection-view')">⬅ Volver</button>
                 <h2>Tu Perfil de Chef</h2>
             </div>
             
@@ -83,7 +83,6 @@
         <!-- VISTA DE SELECCIÓN DE NIVELES (RECETAS) -->
         <section id="level-selection-view" class="view hidden">
             <div class="header-with-back">
-                <button class="btn-back" onclick="app.showView('home-view')">⬅ Volver</button>
                 <h2>Recetario de Misiones</h2>
             </div>
             
@@ -141,7 +140,6 @@
         <!-- VISTA DE TIENDA -->
         <section id="shop-view" class="view hidden">
             <div class="header-with-back">
-                <button class="btn-back" onclick="app.showView('level-selection-view')">⬅ Volver</button>
                 <h2>Mercado del Chef</h2>
                 <p>Usa tus ChefCoins 🪙 para comprar ventajas para tus próximas recetas.</p>
             </div>
