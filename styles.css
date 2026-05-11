@@ -143,6 +143,28 @@ main {
     font-size: 1.2rem;
 }
 
+.btn-danger {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem auto;
+}
+.btn-danger:hover {
+    background: var(--accent);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(239, 71, 111, 0.3);
+}
+
 
 .header-with-back {
     margin-bottom: 2.5rem;
@@ -748,6 +770,38 @@ main {
     animation: crownFloat 3s ease-in-out infinite, crownGlow 2s ease-in-out infinite;
     vertical-align: middle;
     cursor: help;
+}
+
+#profile-crown.hidden { display: none !important; }
+
+@keyframes crownFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(8deg); }
+}
+
+@keyframes crownGlow {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+    50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)); }
+}
+
+/* --- ZONA DE PELIGRO --- */
+.danger-zone {
+    margin-top: 4rem;
+    padding: 2rem;
+    border-top: 2px dashed #ddd;
+    text-align: center;
+    background: rgba(239, 71, 111, 0.03);
+    border-radius: var(--radius);
+}
+.danger-zone h3 {
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+}
+.danger-zone p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
 }
 
 #profile-crown.hidden { display: none !important; }

@@ -64,6 +64,13 @@ const app = {
             this.state = { ...this.state, ...parsed };
         }
     },
+
+    resetProgress() {
+        if (confirm("¿Estás seguro de que quieres borrar todo tu progreso? Esta acción no se puede deshacer.")) {
+            localStorage.removeItem('chefManiaState');
+            location.reload();
+        }
+    },
     
     categories: [
         { id: 'platillos', name: 'Platillos Principales' },
