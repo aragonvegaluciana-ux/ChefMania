@@ -12,7 +12,8 @@ const app = {
         purchasedItems: [],
         lastLifeTime: Date.now(),
         gameCompleted: false,
-        playerName: ""
+        playerName: "",
+        tutorialSeen: false
     },
 
     sounds: {},
@@ -364,6 +365,13 @@ const app = {
         this.renderLevelMap();
         this.renderAchievements();
         this.initAudio();
+        
+        // Iniciar tutorial si es la primera vez
+        setTimeout(() => {
+            if (!this.state.tutorialSeen) {
+                this.startTutorial();
+            }
+        }, 1000);
     },
 
     startLifeRegenTimer() {
@@ -1153,6 +1161,115 @@ const app = {
             console.error("Error generating certificate:", err);
             this.showFeedback('Error', 'No se pudo generar el diploma. Inténtalo de nuevo.', true);
         });
+    },
+
+    // --- TUTORIAL ---
+    tutorialState: {
+        currentStep: 0,
+        steps: [
+            {
+                title: "¡Bienvenido, Chef!",
+                text: "Soy tu mentor en esta academia. Te enseñaré a navegar por la cocina para que te conviertas en un profesional.",
+                element: null
+            },
+            {
+                title: "Tus Estadísticas",
+                text: "Aquí puedes ver tus ❤️ (vidas), ⭐ (experiencia) y 🪙 (ChefCoins). ¡Úsalas para crecer!",
+                element: "main-header"
+            },
+            {
+                title: "Tu Recetario",
+                text: "Este botón te lleva al mapa de niveles. ¡Es donde ocurre la acción!",
+                element: "recipes-btn"
+            },
+            {
+                title: "Tu Perfil",
+                text: "Aquí puedes ver tus logros, cambiar tu nombre y descargar tu diploma cuando seas Maestro.",
+                element: "profile-btn"
+            },
+            {
+                title: "¡A Cocinar!",
+                text: "Haz clic en '¡Empezar a Jugar!' para comenzar tu primera receta. ¡Mucha suerte!",
+                element: "home-view"
+            }
+        ]
+    },
+
+    startTutorial() {
+        document.getElementById('tutorial-overlay').classList.remove('hidden');
+        this.tutorialState.currentStep = 0;
+        this.showTutorialStep();
+        
+        // Ajustar spotlight si la ventana cambia de tamaño
+        window.onresize = () => {
+            if (!document.getElementById('tutorial-overlay').classList.contains('hidden')) {
+                const step = this.tutorialState.steps[this.tutorialState.currentStep];
+                this.updateTutorialSpotlight(step.element);
+            }
+        };
+    },
+
+    showTutorialStep() {
+        const step = this.tutorialState.steps[this.tutorialState.currentStep];
+        document.getElementById('tutorial-title').innerText = step.title;
+        document.getElementById('tutorial-text').innerText = step.text;
+        
+        const nextBtn = document.getElementById('tutorial-next-btn');
+        nextBtn.innerText = this.tutorialState.currentStep === this.tutorialState.steps.length - 1 ? "¡Entendido!" : "Siguiente";
+
+        this.updateTutorialSpotlight(step.element);
+    },
+
+    nextTutorialStep() {
+        this.tutorialState.currentStep++;
+        if (this.tutorialState.currentStep < this.tutorialState.steps.length) {
+            this.showTutorialStep();
+        } else {
+            this.finishTutorial();
+        }
+    },
+
+    updateTutorialSpotlight(elementId) {
+        const spotlight = document.getElementById('tutorial-spotlight');
+        const tooltip = document.getElementById('tutorial-tooltip');
+        
+        if (!elementId) {
+            spotlight.style.width = '0px';
+            spotlight.style.height = '0px';
+            spotlight.style.top = '50%';
+            spotlight.style.left = '50%';
+            
+            tooltip.style.top = '50%';
+            tooltip.style.left = '50%';
+            tooltip.style.transform = 'translate(-50%, -50%)';
+            return;
+        }
+
+        const el = document.getElementById(elementId);
+        const rect = el.getBoundingClientRect();
+        const padding = 10;
+
+        spotlight.style.width = `${rect.width + padding * 2}px`;
+        spotlight.style.height = `${rect.height + padding * 2}px`;
+        spotlight.style.top = `${rect.top - padding}px`;
+        spotlight.style.left = `${rect.left - padding}px`;
+
+        tooltip.style.transform = 'none';
+        if (rect.bottom + 250 > window.innerHeight) {
+            tooltip.style.top = `${rect.top - 220}px`;
+        } else {
+            tooltip.style.top = `${rect.bottom + 20}px`;
+        }
+        
+        const tooltipLeft = Math.min(window.innerWidth - 340, Math.max(20, rect.left + rect.width/2 - 160));
+        tooltip.style.left = `${tooltipLeft}px`;
+    },
+
+    finishTutorial() {
+        document.getElementById('tutorial-overlay').classList.add('hidden');
+        this.state.tutorialSeen = true;
+        this.saveState();
+        window.onresize = null;
     }
 };
 
