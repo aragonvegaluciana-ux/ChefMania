@@ -239,5 +239,21 @@
     </div>
 
     <script src="app.js?v=4"></script>
+
+    <!-- TUTORIAL OVERLAY -->
+    <div id="tutorial-overlay" class="tutorial-overlay hidden">
+        <div id="tutorial-spotlight" class="tutorial-spotlight"></div>
+        <div id="tutorial-tooltip" class="tutorial-tooltip">
+            <div class="tutorial-chef">👨‍🍳</div>
+            <div class="tutorial-content">
+                <h3 id="tutorial-title">Bienvenido</h3>
+                <p id="tutorial-text">Mensaje del tutorial...</p>
+                <div class="tutorial-footer">
+                    <button class="btn-text" onclick="app.finishTutorial()">Saltar</button>
+                    <button class="btn-primary" id="tutorial-next-btn" onclick="app.nextTutorialStep()">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
