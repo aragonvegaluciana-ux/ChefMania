@@ -59,10 +59,11 @@
                 <h2>Tu Perfil de Chef <span id="profile-crown" class="hidden">👑</span></h2>
             </div>
             
-            <div class="profile-settings-card">
-                <label for="player-name-input">Tu Nombre de Chef:</label>
-                <div class="input-group">
-                    <input type="text" id="player-name-input" placeholder="Escribe tu nombre para el diploma..." onchange="app.savePlayerName()">
+            <div class="profile-header-card">
+                <div class="profile-avatar">👨‍🍳</div>
+                <div class="profile-name-edit">
+                    <label for="player-name-input">Nombre del Chef</label>
+                    <input type="text" id="player-name-input" placeholder="Tu nombre artístico..." oninput="app.savePlayerName()">
                 </div>
             </div>
             
@@ -102,6 +103,17 @@
                 <h3>Tus Logros</h3>
                 <div class="achievements-grid" id="achievements-container">
                     <!-- Generado dinámicamente -->
+                </div>
+            </div>
+
+            <div id="cert-download-section" class="hidden">
+                <div class="cert-promo-card">
+                    <div class="cert-promo-icon">📜</div>
+                    <div class="cert-promo-info">
+                        <h3>¡Diploma de Maestría Disponible!</h3>
+                        <p>Has demostrado ser un chef excepcional. Descarga tu certificado oficial ahora.</p>
+                        <button class="btn-primary btn-large" onclick="app.downloadCertificate()">🎓 Descargar Diploma (PNG)</button>
+                    </div>
                 </div>
             </div>
         </section>
