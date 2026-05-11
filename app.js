@@ -578,18 +578,19 @@ const app = {
         });
 
         const achievements = [
-            { id: 'first', name: 'Primer Corte', icon: '🔪', unlocked: this.state.completedRecipes > 0 },
-            { id: 'perfect3', name: 'Cocina Impecable', icon: '✨', unlocked: this.state.perfectWins >= 3 },
-            { id: 'speed', name: 'Chef Relámpago', icon: '⚡', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.fastWin) },
-            { id: 'clutch', name: 'Al Filo', icon: '🕒', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.clutchWin) },
-            { id: 'investor', name: 'Inversionista', icon: '💎', unlocked: this.state.purchasedItems.length >= 2 },
-            { id: 'master', name: 'Dominio Temático', icon: '🎓', unlocked: hasFullCategory },
-            { id: 'xp500', name: 'Chef de Oro', icon: '🏆', unlocked: this.state.xp >= 500 },
-            { id: 'recipes5', name: 'Gourmet', icon: '🥗', unlocked: this.state.completedRecipes >= 5 }
+            { id: 'first', name: 'Primer Corte', icon: '🔪', hint: 'Completa tu primera receta.', unlocked: this.state.completedRecipes > 0 },
+            { id: 'perfect3', name: 'Cocina Impecable', icon: '✨', hint: 'Gana 3 estrellas en 3 niveles.', unlocked: this.state.perfectWins >= 3 },
+            { id: 'speed', name: 'Chef Relámpago', icon: '⚡', hint: 'Completa un nivel en tiempo récord.', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.fastWin) },
+            { id: 'clutch', name: 'Al Filo', icon: '🕒', hint: 'Gana cuando falten menos de 2 segundos.', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.clutchWin) },
+            { id: 'investor', name: 'Inversionista', icon: '💎', hint: 'Compra 2 objetos en la tienda.', unlocked: this.state.purchasedItems.length >= 2 },
+            { id: 'master', name: 'Dominio Temático', icon: '🎓', hint: 'Completa todos los niveles de una categoría.', unlocked: hasFullCategory },
+            { id: 'xp500', name: 'Chef de Oro', icon: '🏆', hint: 'Consigue 500 puntos de XP.', unlocked: this.state.xp >= 500 },
+            { id: 'recipes5', name: 'Gourmet', icon: '🥗', hint: 'Completa 5 recetas diferentes.', unlocked: this.state.completedRecipes >= 5 }
         ];
 
         container.innerHTML = achievements.map(ach => `
-            <div class="achievement ${ach.unlocked ? 'unlocked' : 'locked'}" title="${ach.unlocked ? '¡Logrado!' : 'Aún por descubrir'}">
+            <div class="achievement ${ach.unlocked ? 'unlocked' : 'locked'}" 
+                 title="${ach.unlocked ? '¡Logrado!' : 'REQUISITO: ' + ach.hint}">
                 <div class="achievement-icon">${ach.icon}</div>
                 <div class="achievement-name">${ach.name}</div>
             </div>
