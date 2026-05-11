@@ -1,0 +1,28 @@
+{
+  "name": "chef-mania",
+  "version": "1.0.0",
+  "description": "ChefManía - ¡Aprende a Cocinar Jugando! An educational cooking game.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx http-server -p 3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aragonvegaluciana-ux/ChefMania.git"
+  },
+  "keywords": [
+    "cooking",
+    "game",
+    "educational"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aragonvegaluciana-ux/ChefMania/issues"
+  },
+  "homepage": "https://github.com/aragonvegaluciana-ux/ChefMania#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
