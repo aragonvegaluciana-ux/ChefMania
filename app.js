@@ -17,10 +17,23 @@ const app = {
 
     initAudio() {
         this.sounds = {
-            win: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
-            lose: new Audio('https://assets.mixkit.co/active_storage/sfx/2020/2020-preview.mp3')
+            win: new Audio('https://raw.githubusercontent.com/AnHeuermann/sounds/master/success.mp3'),
+            lose: new Audio('https://raw.githubusercontent.com/the-m-m/sound-effects/master/fail-trombone-01.mp3')
         };
-        // Pre-cargar audios
+        
+        // Pre-cargar y desbloquear audio en la primera interacción (Autoplay Policy)
+        const unlockAudio = () => {
+            Object.values(this.sounds).forEach(audio => {
+                audio.play().then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }).catch(e => console.warn("Audio unlock failed:", e));
+            });
+            document.removeEventListener('click', unlockAudio);
+            console.log("Audio desbloqueado para la sesión.");
+        };
+        document.addEventListener('click', unlockAudio);
+
         Object.values(this.sounds).forEach(audio => {
             audio.load();
         });
@@ -28,9 +41,10 @@ const app = {
 
     playSound(name) {
         if (this.sounds[name]) {
+            console.log("Intentando reproducir:", name);
             this.sounds[name].currentTime = 0;
             this.sounds[name].play().catch(e => {
-                console.warn("Audio play failed (waiting for user interaction):", e);
+                console.error(`Error al reproducir ${name}:`, e);
             });
         }
     },
