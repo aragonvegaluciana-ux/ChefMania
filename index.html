@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
     <!-- HEADER GLOBAl -->
@@ -56,6 +57,18 @@
         <section id="profile-view" class="view hidden">
             <div class="header-with-back">
                 <h2>Tu Perfil de Chef <span id="profile-crown" class="hidden">👑</span></h2>
+            </div>
+            
+            <div class="profile-settings-card">
+                <label for="player-name-input">Tu Nombre de Chef:</label>
+                <div class="input-group">
+                    <input type="text" id="player-name-input" placeholder="Escribe tu nombre para el diploma..." onchange="app.savePlayerName()">
+                </div>
+            </div>
+            
+            <div id="cert-download-section" class="hidden">
+                <button class="btn-primary btn-large" onclick="app.downloadCertificate()">🎓 Descargar Diploma de Maestro</button>
+                <p class="small-text">¡Comparte tu logro con el mundo!</p>
             </div>
             
             <div class="profile-stats">
@@ -178,6 +191,31 @@
         </section>
 
     </main>
+
+    <!-- PLANTILLA DEL DIPLOMA (OCULTA) -->
+    <div id="cert-template-container" class="cert-offscreen">
+        <div id="certificate">
+            <div class="cert-border">
+                <div class="cert-content">
+                    <div class="cert-header-logo">ChefManía</div>
+                    <h1 class="cert-title">Certificado de Excelencia</h1>
+                    <p class="cert-subtitle">MAESTRÍA GASTRONÓMICA</p>
+                    <div class="cert-divider"></div>
+                    <p class="cert-text-top">Se otorga con orgullo el presente diploma a:</p>
+                    <h2 id="cert-user-name" class="cert-name">MAESTRO CHEF</h2>
+                    <p class="cert-text-bottom">Por haber demostrado una habilidad excepcional y dedicación absoluta al completar todas las recetas y desafíos de la Academia ChefManía.</p>
+                    <div class="cert-footer">
+                        <div class="cert-date">Fecha: <span id="cert-date-val">11/05/2026</span></div>
+                        <div class="cert-seal">👑</div>
+                        <div class="cert-signature">
+                            <div class="signature-line"></div>
+                            <p>Director de la Academia</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL DE FEEDBACK (CORRECTO/INCORRECTO) -->
     <div id="feedback-modal" class="modal-overlay hidden">

@@ -11,7 +11,8 @@ const app = {
         perfectWins: 0,
         purchasedItems: [],
         lastLifeTime: Date.now(),
-        gameCompleted: false
+        gameCompleted: false,
+        playerName: ""
     },
 
     sounds: {},
@@ -442,6 +443,19 @@ const app = {
         if (crown) {
             if (this.state.gameCompleted) crown.classList.remove('hidden');
             else crown.classList.add('hidden');
+        }
+
+        // Mostrar sección de descarga si el juego está completado
+        const certSection = document.getElementById('cert-download-section');
+        if (certSection) {
+            if (this.state.gameCompleted) certSection.classList.remove('hidden');
+            else certSection.classList.add('hidden');
+        }
+
+        // Cargar nombre en el input
+        const nameInput = document.getElementById('player-name-input');
+        if (nameInput) {
+            nameInput.value = this.state.playerName || "";
         }
         
         let rank = "Pinche de Cocina";
@@ -1091,6 +1105,54 @@ const app = {
             this.updateHeaderStats();
             this.saveState();
         }, 1500);
+    },
+
+    savePlayerName() {
+        const input = document.getElementById('player-name-input');
+        if (input) {
+            this.state.playerName = input.value;
+            this.saveState();
+        }
+    },
+
+    downloadCertificate() {
+        if (!this.state.gameCompleted) {
+            this.showFeedback('Bloqueado', 'Completa todas las recetas para desbloquear tu diploma.', true);
+            return;
+        }
+
+        const name = this.state.playerName || "MAESTRO CHEF";
+        const date = new Date().toLocaleDateString();
+
+        // Actualizar plantilla con datos actuales
+        document.getElementById('cert-user-name').innerText = name.toUpperCase();
+        document.getElementById('cert-date-val').innerText = date;
+
+        const target = document.getElementById('certificate');
+        
+        this.showFeedback('Generando Diploma', 'Espera un momento mientras preparamos tu certificado...');
+
+        if (typeof html2canvas === 'undefined') {
+            this.showFeedback('Error', 'La librería de generación no está lista. Revisa tu conexión.', true);
+            return;
+        }
+
+        html2canvas(target, {
+            scale: 2, // Mejor calidad
+            backgroundColor: "#fffdf5",
+            logging: false,
+            useCORS: true
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `Diploma_ChefMania_${name.replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            this.showFeedback('¡Éxito!', 'Tu diploma se ha descargado correctamente. ¡Felicidades, Chef!');
+        }).catch(err => {
+            console.error("Error generating certificate:", err);
+            this.showFeedback('Error', 'No se pudo generar el diploma. Inténtalo de nuevo.', true);
+        });
     }
 };
 
