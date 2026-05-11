@@ -192,59 +192,43 @@ main {
 }
 
 /* --- VISTA MAPA NIVELES --- */
-/* --- VISTA MAPA NIVELES (LÍNEA DE TIEMPO HORIZONTAL) --- */
+/* --- VISTA MAPA NIVELES (RESPONSIVO Y MULTILÍNEA) --- */
 .level-map {
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 0;
-    padding: 4rem 2rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    min-height: 400px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4rem 2rem;
+    padding: 3rem 1rem;
+    overflow-x: visible;
     background: radial-gradient(circle at 50% 50%, #fffcf2 0%, #fff9e6 100%);
     border-radius: var(--radius);
 }
 
-/* Scrollbar personalizada premium */
+/* Ocultar scrollbar ya que ahora es multilínea */
 .level-map::-webkit-scrollbar {
-    height: 10px;
-}
-.level-map::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.03);
-    border-radius: 10px;
-    margin: 0 40px;
-}
-.level-map::-webkit-scrollbar-thumb {
-    background: var(--secondary);
-    border-radius: 10px;
-    border: 2px solid #fffcf2;
-}
-.level-map::-webkit-scrollbar-thumb:hover {
-    background: var(--primary);
+    display: none;
 }
 
 .category-section {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    min-width: max-content;
+    align-items: center;
+    width: 100%;
     position: relative;
+    margin-bottom: 2rem;
 }
 
 .category-title {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     color: var(--primary);
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     background: white;
-    padding: 0.5rem 1.2rem;
+    padding: 0.6rem 1.5rem;
     border-radius: 30px;
     box-shadow: var(--shadow);
     display: inline-block;
-    white-space: nowrap;
     border: 1px solid rgba(0,0,0,0.05);
+    text-align: center;
 }
 .category-progress {
     font-size: 0.85rem;
@@ -260,8 +244,11 @@ main {
 .category-map {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    padding: 1rem 0;
+    gap: 1.5rem;
+    width: 100%;
 }
 .node {
     width: 100px;
@@ -315,17 +302,24 @@ main {
     text-shadow: 0 0 8px rgba(255, 209, 102, 0.6);
 }
 .connector { 
-    width: 70px; 
-    height: 8px; 
+    width: 40px; 
+    height: 6px; 
     background: #fff; 
-    margin: 0 -5px;
+    margin: 0 -10px;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
     position: relative;
     z-index: 1;
+    border-radius: 3px;
 }
-.connector.active { 
-    background: var(--primary); 
-    box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+
+/* Ocultar conectores en pantallas pequeñas si rompen el flujo */
+@media (max-width: 600px) {
+    .connector { display: none; }
+    .category-map { gap: 3rem 1rem; }
+    .node { width: 80px; height: 80px; border-width: 4px; }
+    .node-icon { font-size: 1.8rem; }
+    .node-title { font-size: 0.8rem; bottom: -35px; padding: 2px 8px; }
+    .node-stars { top: -25px; font-size: 1rem; }
 }
 
 /* --- VISTA PERFIL --- */

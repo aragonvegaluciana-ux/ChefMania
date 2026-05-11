@@ -552,8 +552,6 @@ const app = {
                     
                     const catConnector = document.createElement('div');
                     catConnector.className = `connector ${isLastCompleted ? 'active' : ''}`;
-                    catConnector.style.alignSelf = 'center';
-                    catConnector.style.marginTop = '2rem'; // Alineado con los nodos
                     container.appendChild(catConnector);
                 }
             }
