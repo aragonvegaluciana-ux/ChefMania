@@ -690,3 +690,27 @@ main {
     .game-progress { width: 100%; margin: 0; }
     .chef-tip { flex-direction: column; text-align: center; }
 }
+
+/* --- RECONOCIMIENTO ESPECIAL --- */
+#profile-crown {
+    font-size: 2.8rem;
+    margin-left: 15px;
+    display: inline-block;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+    animation: crownFloat 3s ease-in-out infinite, crownGlow 2s ease-in-out infinite;
+    vertical-align: middle;
+    cursor: help;
+}
+
+#profile-crown.hidden { display: none !important; }
+
+@keyframes crownFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(8deg); }
+}
+
+@keyframes crownGlow {
+    0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+    50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)); }
+}
+

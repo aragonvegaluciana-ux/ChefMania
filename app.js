@@ -10,7 +10,8 @@ const app = {
         levelScores: {},
         perfectWins: 0,
         purchasedItems: [],
-        lastLifeTime: Date.now()
+        lastLifeTime: Date.now(),
+        gameCompleted: false
     },
 
     sounds: {},
@@ -436,6 +437,13 @@ const app = {
         document.getElementById('profile-xp').innerText = this.state.xp;
         document.getElementById('profile-recipes').innerText = this.state.completedRecipes;
         
+        // Mostrar corona si el juego está completado
+        const crown = document.getElementById('profile-crown');
+        if (crown) {
+            if (this.state.gameCompleted) crown.classList.remove('hidden');
+            else crown.classList.add('hidden');
+        }
+        
         let rank = "Pinche de Cocina";
         if(this.state.xp >= 100) rank = "Aprendiz de Chef";
         if(this.state.xp >= 300) rank = "Cocinero de Línea";
@@ -845,6 +853,42 @@ const app = {
         this.saveState();
     },
 
+    checkAllLevelsCompleted() {
+        const totalLevels = this.levels.length;
+        const completedLevels = Object.keys(this.state.levelScores).length;
+
+        if (completedLevels >= totalLevels && !this.state.gameCompleted) {
+            this.state.gameCompleted = true;
+            this.saveState();
+            setTimeout(() => this.triggerWinCelebration(), 1000);
+        }
+    },
+
+    triggerWinCelebration() {
+        // Lanzar confeti (requiere canvas-confetti)
+        if (window.confetti) {
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                window.confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                window.confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        this.showFeedback('👑 ¡MAESTRO CHEF! 👑', '¡Increíble! Has completado todas las recetas de la academia. Ahora llevas la Corona de Maestro en tu perfil.');
+    },
+
     endGame(success) {
         clearInterval(this.currentGame.timer);
         this.currentGame.timer = null;
@@ -898,6 +942,9 @@ const app = {
                     this.state.unlockedLevels.push(nextLevelId);
                 }
             }
+
+            // Verificar si ha completado todo el juego
+            this.checkAllLevelsCompleted();
             
             this.playSound('win');
             
