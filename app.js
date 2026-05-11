@@ -569,32 +569,80 @@ const app = {
         const container = document.getElementById('achievements-container');
         if (!container) return;
 
-        const hasThreeStars = Object.values(this.state.levelScores).some(s => s.stars === 3);
-        
-        // Verificar si alguna categoría está completa (100%)
         const hasFullCategory = this.categories.some(cat => {
             const catLevels = this.levels.filter(l => l.categoryId === cat.id);
             return catLevels.every(l => this.state.levelScores[l.id]);
         });
 
         const achievements = [
-            { id: 'first', name: 'Primer Corte', icon: '🔪', hint: 'Completa tu primera receta.', unlocked: this.state.completedRecipes > 0 },
-            { id: 'perfect3', name: 'Cocina Impecable', icon: '✨', hint: 'Gana 3 estrellas en 3 niveles.', unlocked: this.state.perfectWins >= 3 },
-            { id: 'speed', name: 'Chef Relámpago', icon: '⚡', hint: 'Completa un nivel en tiempo récord.', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.fastWin) },
-            { id: 'clutch', name: 'Al Filo', icon: '🕒', hint: 'Gana cuando falten menos de 2 segundos.', unlocked: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.clutchWin) },
-            { id: 'investor', name: 'Inversionista', icon: '💎', hint: 'Compra 2 objetos en la tienda.', unlocked: this.state.purchasedItems.length >= 2 },
-            { id: 'master', name: 'Dominio Temático', icon: '🎓', hint: 'Completa todos los niveles de una categoría.', unlocked: hasFullCategory },
-            { id: 'xp500', name: 'Chef de Oro', icon: '🏆', hint: 'Consigue 500 puntos de XP.', unlocked: this.state.xp >= 500 },
-            { id: 'recipes5', name: 'Gourmet', icon: '🥗', hint: 'Completa 5 recetas diferentes.', unlocked: this.state.completedRecipes >= 5 }
+            { id: 'first', name: 'Primer Corte', icon: '🔪', hint: 'Completa tu primera receta.' },
+            { id: 'perfect3', name: 'Cocina Impecable', icon: '✨', hint: 'Gana 3 estrellas en 3 niveles.' },
+            { id: 'speed', name: 'Chef Relámpago', icon: '⚡', hint: 'Completa un nivel en tiempo récord.' },
+            { id: 'clutch', name: 'Al Filo', icon: '🕒', hint: 'Gana cuando falten menos de 2 segundos.' },
+            { id: 'investor', name: 'Inversionista', icon: '💎', hint: 'Compra 2 objetos en la tienda.' },
+            { id: 'master', name: 'Dominio Temático', icon: '🎓', hint: 'Completa todos los niveles de una categoría.' },
+            { id: 'xp500', name: 'Chef de Oro', icon: '🏆', hint: 'Consigue 500 puntos de XP.' },
+            { id: 'recipes5', name: 'Gourmet', icon: '🥗', hint: 'Completa 5 recetas diferentes.' }
         ];
 
-        container.innerHTML = achievements.map(ach => `
-            <div class="achievement ${ach.unlocked ? 'unlocked' : 'locked'}" 
-                 title="${ach.unlocked ? '¡Logrado!' : 'REQUISITO: ' + ach.hint}">
-                <div class="achievement-icon">${ach.icon}</div>
-                <div class="achievement-name">${ach.name}</div>
+        container.innerHTML = achievements.map(ach => {
+            const isUnlocked = this.state.achievements.includes(ach.id);
+            return `
+                <div class="achievement ${isUnlocked ? 'unlocked' : 'locked'}" 
+                     title="${isUnlocked ? '¡Logrado!' : 'REQUISITO: ' + ach.hint}">
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-name">${ach.name}</div>
+                </div>
+            `;
+        }).join('');
+    },
+
+    checkAchievements() {
+        const hasFullCategory = this.categories.some(cat => {
+            const catLevels = this.levels.filter(l => l.categoryId === cat.id);
+            return catLevels.every(l => this.state.levelScores[l.id]);
+        });
+
+        const checks = [
+            { id: 'first', name: 'Primer Corte', icon: '🔪', condition: this.state.completedRecipes > 0 },
+            { id: 'perfect3', name: 'Cocina Impecable', icon: '✨', condition: this.state.perfectWins >= 3 },
+            { id: 'speed', name: 'Chef Relámpago', icon: '⚡', condition: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.fastWin) },
+            { id: 'clutch', name: 'Al Filo', icon: '🕒', condition: this.state.levelScores && Object.values(this.state.levelScores).some(s => s.clutchWin) },
+            { id: 'investor', name: 'Inversionista', icon: '💎', condition: this.state.purchasedItems.length >= 2 },
+            { id: 'master', name: 'Dominio Temático', icon: '🎓', condition: hasFullCategory },
+            { id: 'xp500', name: 'Chef de Oro', icon: '🏆', condition: this.state.xp >= 500 },
+            { id: 'recipes5', name: 'Gourmet', icon: '🥗', condition: this.state.completedRecipes >= 5 }
+        ];
+
+        checks.forEach(check => {
+            if (check.condition && !this.state.achievements.includes(check.id)) {
+                this.state.achievements.push(check.id);
+                this.showToast(`¡Logro Desbloqueado!`, check.icon, check.name);
+            }
+        });
+        
+        this.saveState();
+    },
+
+    showToast(title, icon, message) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        
+        toast.innerHTML = `
+            <div class="toast-icon">${icon}</div>
+            <div class="toast-content">
+                <h4>${title}</h4>
+                <p>${message}</p>
             </div>
-        `).join('');
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('removing');
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
     },
 
     // Lógica del Juego
@@ -1028,7 +1076,7 @@ const app = {
         this.updateHeaderStats();
         this.updateProfileStats();
         this.renderLevelMap();
-        this.renderAchievements();
+        this.checkAchievements();
         this.saveState();
         this.showView('results-view');
     },
@@ -1081,6 +1129,7 @@ const app = {
                 this.showFeedback('Fondos Insuficientes', 'No tienes suficientes monedas para comprar esto.', true);
             }
         }
+        this.checkAchievements();
         this.saveState();
     },
 
