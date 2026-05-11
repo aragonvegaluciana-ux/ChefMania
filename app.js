@@ -13,6 +13,28 @@ const app = {
         lastLifeTime: Date.now()
     },
 
+    sounds: {},
+
+    initAudio() {
+        this.sounds = {
+            win: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
+            lose: new Audio('https://assets.mixkit.co/active_storage/sfx/2020/2020-preview.mp3')
+        };
+        // Pre-cargar audios
+        Object.values(this.sounds).forEach(audio => {
+            audio.load();
+        });
+    },
+
+    playSound(name) {
+        if (this.sounds[name]) {
+            this.sounds[name].currentTime = 0;
+            this.sounds[name].play().catch(e => {
+                console.warn("Audio play failed (waiting for user interaction):", e);
+            });
+        }
+    },
+
     saveState() {
         localStorage.setItem('chefManiaState', JSON.stringify(this.state));
     },
@@ -325,6 +347,7 @@ const app = {
         this.updateProfileStats();
         this.renderLevelMap();
         this.renderAchievements();
+        this.initAudio();
     },
 
     startLifeRegenTimer() {
@@ -862,6 +885,8 @@ const app = {
                 }
             }
             
+            this.playSound('win');
+            
             document.getElementById('results-title').innerText = "¡Receta Completada!";
             document.getElementById('results-title').style.color = "var(--primary)";
             
@@ -879,6 +904,7 @@ const app = {
                 this.state.lastLifeTime = Date.now();
             }
             this.state.lives--;
+            this.playSound('lose');
             document.getElementById('results-title').innerText = "¡Se acabó el tiempo!";
             document.getElementById('results-title').style.color = "var(--accent)";
             document.getElementById('results-stars').innerHTML = "<span>★</span><span>★</span><span>★</span>";
