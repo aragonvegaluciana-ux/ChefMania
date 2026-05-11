@@ -481,7 +481,7 @@ const app = {
         const container = document.getElementById('level-map-container');
         container.innerHTML = '';
 
-        this.categories.forEach(category => {
+        this.categories.forEach((category, catIndex) => {
             const categoryLevels = this.levels.filter(l => l.categoryId === category.id);
             if (categoryLevels.length === 0) return;
 
@@ -516,6 +516,12 @@ const app = {
                         <span class="${stars >= 2 ? 'earned' : ''}">★</span>
                         <span class="${stars >= 3 ? 'earned' : ''}">★</span>
                     </div>`;
+                } else {
+                    starsHTML = `<div class="node-stars">
+                        <span>★</span>
+                        <span>★</span>
+                        <span>★</span>
+                    </div>`;
                 }
 
                 node.innerHTML = `
@@ -525,6 +531,7 @@ const app = {
                 `;
                 mapWrapper.appendChild(node);
 
+                // Conector entre niveles de la misma categoría
                 if (index < categoryLevels.length - 1) {
                     const connector = document.createElement('div');
                     connector.className = `connector ${isCompleted ? 'active' : ''}`;
@@ -534,6 +541,22 @@ const app = {
 
             catContainer.appendChild(mapWrapper);
             container.appendChild(catContainer);
+
+            // Conector entre categorías (excepto en la última)
+            if (catIndex < this.categories.length - 1) {
+                const nextCategory = this.categories[catIndex + 1];
+                const nextCatLevels = this.levels.filter(l => l.categoryId === nextCategory.id);
+                if (nextCatLevels.length > 0) {
+                    const lastLevelOfCurrent = categoryLevels[categoryLevels.length - 1];
+                    const isLastCompleted = !!this.state.levelScores[lastLevelOfCurrent.id];
+                    
+                    const catConnector = document.createElement('div');
+                    catConnector.className = `connector ${isLastCompleted ? 'active' : ''}`;
+                    catConnector.style.alignSelf = 'center';
+                    catConnector.style.marginTop = '2rem'; // Alineado con los nodos
+                    container.appendChild(catConnector);
+                }
+            }
         });
     },
 

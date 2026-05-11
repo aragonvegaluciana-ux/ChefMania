@@ -192,24 +192,59 @@ main {
 }
 
 /* --- VISTA MAPA NIVELES --- */
+/* --- VISTA MAPA NIVELES (LÍNEA DE TIEMPO HORIZONTAL) --- */
 .level-map {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem 0;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+    padding: 4rem 2rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    min-height: 400px;
+    background: radial-gradient(circle at 50% 50%, #fffcf2 0%, #fff9e6 100%);
+    border-radius: var(--radius);
 }
+
+/* Scrollbar personalizada premium */
+.level-map::-webkit-scrollbar {
+    height: 10px;
+}
+.level-map::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.03);
+    border-radius: 10px;
+    margin: 0 40px;
+}
+.level-map::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    border-radius: 10px;
+    border: 2px solid #fffcf2;
+}
+.level-map::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
 .category-section {
-    width: 100%;
-    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: max-content;
+    position: relative;
 }
+
 .category-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--primary);
-    text-align: center;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px dashed #eee;
-    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+    background: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    display: inline-block;
+    white-space: nowrap;
+    border: 1px solid rgba(0,0,0,0.05);
 }
 .category-progress {
     font-size: 0.85rem;
@@ -224,25 +259,27 @@ main {
 }
 .category-map {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 1rem;
+    padding: 1rem 0;
 }
 .node {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     background: var(--surface);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: var(--shadow);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 4px solid #eee;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 6px solid #fff;
     position: relative;
     text-align: center;
+    flex-shrink: 0;
+    z-index: 2;
 }
 .node:hover:not(.locked) { transform: scale(1.15); }
 .node.active { border-color: var(--primary); }
@@ -250,29 +287,46 @@ main {
 .node-icon { font-size: 2.2rem; }
 .node-title {
     position: absolute;
-    bottom: -30px;
+    bottom: -40px;
     white-space: nowrap;
-    font-weight: 600;
-    font-size: 0.9rem;
-    background: var(--surface);
-    padding: 2px 8px;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-light);
+    background: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.03);
 }
 .node-stars {
     position: absolute;
-    bottom: -50px;
-    font-size: 1rem;
-    color: #eee;
+    top: -30px;
+    font-size: 1.2rem;
+    color: #ddd;
     display: flex;
     gap: 2px;
+    background: white;
+    padding: 2px 8px;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 .node-stars .earned {
     color: var(--warning);
-    text-shadow: 0 0 5px rgba(255, 209, 102, 0.5);
+    text-shadow: 0 0 8px rgba(255, 209, 102, 0.6);
 }
-.connector { width: 6px; height: 50px; background: #eee; border-radius: 3px; }
-.connector.active { background: var(--primary); }
+.connector { 
+    width: 70px; 
+    height: 8px; 
+    background: #fff; 
+    margin: 0 -5px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 1;
+}
+.connector.active { 
+    background: var(--primary); 
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.3);
+}
 
 /* --- VISTA PERFIL --- */
 .profile-stats {
